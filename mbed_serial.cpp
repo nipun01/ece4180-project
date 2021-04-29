@@ -51,39 +51,11 @@ int main(int argc, char ** argv) {
   }
   // Read the characters from the port if they are there
   sleep(1);
-  /*
-  n = read(fd, buf, 4000);
-  if (n < 0) {
-    perror("Read failed - ");
-    return -1;
-  } else if (n == 0) printf("No data on port\n");
-  else {
-    bytes_read += n;
-    buf[n] = 0;
-    printf("%i bytes read back: %s\n\r", n, buf);
-  }
-  sleep(5);
-    // Write to the port
-  n = write(fd,"j",1);
-  if (n < 0) {
-    perror("Write failed - ");
-    return -1;
-  }
-  // Read the characters from the port if they are there
-  sleep(5);
-  n = read(fd, buf, 14409);
-  if (n < 0) {
-    perror("Read failed - ");
-    return -1;
-  } else if (n == 0) printf("No data on port\n");
-  else {
-    buf[n] = 0;
-    printf("%i bytes read back: %s\n\r", n, buf);
-  }
-  sleep(1);
-  */
   readDataFromSerial(14409, 4000, fd, buf);
-  printf("%s\n\r", buf);
+  //printf("%s\n\r", buf);
+  FILE *right_file;
+  right_file = fopen("right_map.out", "w");
+  fprintf(right_file, "%s", buf);
 
   // Write to the port
   n = write(fd,"j",1);
@@ -91,11 +63,13 @@ int main(int argc, char ** argv) {
     perror("Write failed - ");
     return -1;
   }
+  FILE *left_file;
+  left_file = fopen("left_map.out", "w");
+  fprintf(left_file, "%s", buf);
 
   sleep(1);
-
   readDataFromSerial(14409, 4000, fd, buf);
-  printf("%s\n\r", buf);
+  //printf("%s\n\r", buf);
 
   // Don't forget to clean up and close the port
   tcdrain(fd);
