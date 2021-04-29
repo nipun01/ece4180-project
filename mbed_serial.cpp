@@ -7,7 +7,7 @@
  
 int main(int argc, char ** argv) {
   int fd;
-  char buf[256];
+  char buf[15000];
   int n;
   // Open the Port. We want read/write, no "controlling tty" status, 
   // and open it no matter what state DCD is in
@@ -28,16 +28,34 @@ int main(int argc, char ** argv) {
   options.c_cflag |= CREAD;
   cfmakeraw(&options);
   tcsetattr(fd,TCSANOW,&options);    //Set serial to new settings
-  sleep(1);
+  sleep(5);
   // Write to the port
-  n = write(fd,"Hello mbed\r",11);
+  n = write(fd,"j",1);
   if (n < 0) {
     perror("Write failed - ");
     return -1;
   }
   // Read the characters from the port if they are there
   sleep(2);
-  n = read(fd, buf, 11);
+  n = read(fd, buf, 14409);
+  if (n < 0) {
+    perror("Read failed - ");
+    return -1;
+  } else if (n == 0) printf("No data on port\n");
+  else {
+    buf[n] = 0;
+    printf("%i bytes read back: %s\n\r", n, buf);
+  }
+  sleep(5);
+    // Write to the port
+  n = write(fd,"j",1);
+  if (n < 0) {
+    perror("Write failed - ");
+    return -1;
+  }
+  // Read the characters from the port if they are there
+  sleep(2);
+  n = read(fd, buf, 14409);
   if (n < 0) {
     perror("Read failed - ");
     return -1;
@@ -47,21 +65,7 @@ int main(int argc, char ** argv) {
     printf("%i bytes read back: %s\n\r", n, buf);
   }
   sleep(1);
-  //Send command to blink mbed led 10 times at one second rate
-  //mbed code turns on led2 with a '1' and off with a '0'
-  //mbed echoes back each character
-  buf[1] = '\r'; // end of line
-  buf[2] = 0; // end of string
-  for(int i=0;i<10;i++) {
-      write(fd,"1",1);        //led on
-      sleep(1);               //one second delay  
-      read(fd,buf,1); //read echo character
-      printf("%s\n\r",buf);   //print in terminal window
-      write(fd,"0",1);        //led off
-      sleep(1);   
-      read(fd,buf,1);
-      printf("%s\n\r",buf);
-  }
+
   // Don't forget to clean up and close the port
   tcdrain(fd);
   close(fd);
