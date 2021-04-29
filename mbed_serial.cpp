@@ -65,48 +65,52 @@ int main(int argc, char ** argv) {
   options.c_cflag |= CREAD;
   cfmakeraw(&options);
   tcsetattr(fd,TCSANOW,&options);    //Set serial to new settings
-  sleep(5);
-  // Write to the port
-  n = write(fd,"j",1);
-  if (n < 0) {
-    perror("Write failed - ");
-    return -1;
-  }
-  // Read the characters from the port if they are there
   sleep(1);
-  readDataFromSerial(14409, 4000, fd, buf);
-  char *buf2 = shiftBuffer(14409 / 2, 14409, buf);
-  //printf("%s\n\r", buf);
-  FILE *right_file;
-  right_file = fopen("right_map1.out", "w");
-  fprintf(right_file, "%s", buf);
-  fclose(right_file);
-  right_file = fopen("right_map2.out", "w");
-  fprintf(right_file, "%s", buf2);
-  fclose(right_file);
+
+  while (1)
+  {
+    // Write to the port
+    n = write(fd,"j",1);
+    if (n < 0) {
+      perror("Write failed - ");
+      return -1;
+    }
+    // Read the characters from the port if they are there
+    sleep(1);
+    readDataFromSerial(14409, 4000, fd, buf);
+    char *buf2 = shiftBuffer(14409 / 2, 14409, buf);
+    //printf("%s\n\r", buf);
+    FILE *right_file;
+    right_file = fopen("right_map1.out", "w");
+    fprintf(right_file, "%s", buf);
+    fclose(right_file);
+    right_file = fopen("right_map2.out", "w");
+    fprintf(right_file, "%s", buf2);
+    fclose(right_file);
 
 
 
-  // Write to the port
-  n = write(fd,"j",1);
-  if (n < 0) {
-    perror("Write failed - ");
-    return -1;
+    // Write to the port
+    n = write(fd,"j",1);
+    if (n < 0) {
+      perror("Write failed - ");
+      return -1;
+    }
+
+    sleep(1);
+    readDataFromSerial(14409, 4000, fd, buf);
+    buf2 = shiftBuffer(14409 / 2, 14409, buf);
+
+    FILE *left_file;
+    left_file = fopen("left_map1.out", "w");
+    fprintf(left_file, "%s", buf);
+    fclose(left_file);
+    left_file = fopen("left_map2.out", "w");
+    fprintf(left_file, "%s", buf2);
+    fclose(left_file);
+
+    system("python3 post_data.py");
   }
-
-  sleep(1);
-  readDataFromSerial(14409, 4000, fd, buf);
-  buf2 = shiftBuffer(14409 / 2, 14409, buf);
-
-  FILE *left_file;
-  left_file = fopen("left_map1.out", "w");
-  fprintf(left_file, "%s", buf);
-  fclose(left_file);
-  left_file = fopen("left_map2.out", "w");
-  fprintf(left_file, "%s", buf2);
-  fclose(left_file);
-
-  system("python3 post_data.py");
   
   //printf("%s\n\r", buf);
 
