@@ -30,9 +30,9 @@ int main()
                                     case '1': //number button 1 -- SERVO CONTROL
                                     if (bhit == '1')
                                     {
-                                        myservo = 0.0; //start servo at 0.0
+                                        myservo = 1.0; //start servo at 1.0 (servo moves from right to left)
                                         wait(1); // make sure it gets set
-                                        for(float p=0.0; p<=1.0; p += 0.01) // move 1.8 deg. at a time
+                                        for(float p=1.0; p>=0.0; p -= 0.01) // move 1.8 deg. at a time
                                         {
                                             myservo = p;
                                             wait(0.05);
