@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -16,6 +17,25 @@ void readDataFromSerial(int totalByteCount, int bytesPerChunk, int fd, char *buf
     bytesRead += n;
   }
   buf[totalByteCount] = 0;
+}
+
+char * shiftBuffer(int shiftPoint, int bufsize, char *buf) 
+{
+  char prevVal = 0;
+  for (int i = 0; i < bufsize; i++)
+  {
+    if (i == shiftPoint) {
+      prevVal = buf[i];
+      buf[i] = 0;
+    }
+    else if (i > shiftPoint) {
+      char temp = buf[i];
+      buf[i] = prevVal;
+      prevVal = temp;
+    }
+  }
+  buf[bufsize] = prevVal;
+  buf[bufsize + 1] = 0;
 }
 
 int main(int argc, char ** argv) {
@@ -52,10 +72,19 @@ int main(int argc, char ** argv) {
   // Read the characters from the port if they are there
   sleep(1);
   readDataFromSerial(14409, 4000, fd, buf);
+  char *buf2 = shiftBuffer(14409 / 2, 14409, buf);
   //printf("%s\n\r", buf);
   FILE *right_file;
-  right_file = fopen("right_map.out", "w");
+  right_file = fopen("right_map1.out", "w");
   fprintf(right_file, "%s", buf);
+  fclose(right_file);
+  right_file = fopen("right_map2.out", "w");
+  fprintf(right_file, "%s", buf2);
+  fclose(right_file);
+
+  sleep(1);
+  readDataFromSerial(14409, 4000, fd, buf);
+  buf2 = shiftBuffer(14409 / 2, 14409, buf);
 
   // Write to the port
   n = write(fd,"j",1);
@@ -64,11 +93,15 @@ int main(int argc, char ** argv) {
     return -1;
   }
   FILE *left_file;
-  left_file = fopen("left_map.out", "w");
+  left_file = fopen("left_map1.out", "w");
   fprintf(left_file, "%s", buf);
+  fclose(left_file);
+  left_file = fopen("left_map2.out", "w");
+  fprintf(left_file, "%s", buf2);
+  fclose(left_file);
 
-  sleep(1);
-  readDataFromSerial(14409, 4000, fd, buf);
+  system("python3 post_data.py")
+  
   //printf("%s\n\r", buf);
 
   // Don't forget to clean up and close the port
