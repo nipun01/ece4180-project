@@ -5,10 +5,24 @@
 #include <errno.h>
 #include <termios.h>
  
+void readDataFromSerial(int totalByteCount, int bytesPerChunk, int fd, char *buf)
+{
+  int bytesRead = 0;
+  while (bytesRead < totalByteCount) {
+    int n = read(fd, &(buf[bytesRead]), bytesPerChunk);
+    if (n <= 0) {
+      continue;
+    }
+    bytesRead += n;
+  }
+  buf[totalByteCount + 1] = 0;
+}
+
 int main(int argc, char ** argv) {
   int fd;
   char buf[15000];
   int n;
+  int bytes_read = 0;
   // Open the Port. We want read/write, no "controlling tty" status, 
   // and open it no matter what state DCD is in
   fd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY | O_NDELAY);  
@@ -36,13 +50,15 @@ int main(int argc, char ** argv) {
     return -1;
   }
   // Read the characters from the port if they are there
-  sleep(2);
-  n = read(fd, buf, 14409);
+  sleep(1);
+  /*
+  n = read(fd, buf, 4000);
   if (n < 0) {
     perror("Read failed - ");
     return -1;
   } else if (n == 0) printf("No data on port\n");
   else {
+    bytes_read += n;
     buf[n] = 0;
     printf("%i bytes read back: %s\n\r", n, buf);
   }
@@ -54,7 +70,7 @@ int main(int argc, char ** argv) {
     return -1;
   }
   // Read the characters from the port if they are there
-  sleep(2);
+  sleep(5);
   n = read(fd, buf, 14409);
   if (n < 0) {
     perror("Read failed - ");
@@ -65,6 +81,9 @@ int main(int argc, char ** argv) {
     printf("%i bytes read back: %s\n\r", n, buf);
   }
   sleep(1);
+  */
+  readDataFromSerial(14409, 4000, fd, buf);
+  printf("%s\n\r", buf);
 
   // Don't forget to clean up and close the port
   tcdrain(fd);
