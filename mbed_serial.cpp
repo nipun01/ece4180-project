@@ -21,11 +21,13 @@ void readDataFromSerial(int totalByteCount, int bytesPerChunk, int fd, char *buf
 
 char * shiftBuffer(int shiftPoint, int bufsize, char *buf) 
 {
+  char * returnBuf = NULL;
   char prevVal = 0;
   for (int i = 0; i < bufsize; i++)
   {
     if (i == shiftPoint) {
       prevVal = buf[i];
+      returnBuf = &(buf[i + 1]);
       buf[i] = 0;
     }
     else if (i > shiftPoint) {
@@ -36,6 +38,7 @@ char * shiftBuffer(int shiftPoint, int bufsize, char *buf)
   }
   buf[bufsize] = prevVal;
   buf[bufsize + 1] = 0;
+  return returnBuf;
 }
 
 int main(int argc, char ** argv) {
@@ -82,9 +85,7 @@ int main(int argc, char ** argv) {
   fprintf(right_file, "%s", buf2);
   fclose(right_file);
 
-  sleep(1);
-  readDataFromSerial(14409, 4000, fd, buf);
-  buf2 = shiftBuffer(14409 / 2, 14409, buf);
+
 
   // Write to the port
   n = write(fd,"j",1);
@@ -92,6 +93,11 @@ int main(int argc, char ** argv) {
     perror("Write failed - ");
     return -1;
   }
+
+  sleep(1);
+  readDataFromSerial(14409, 4000, fd, buf);
+  buf2 = shiftBuffer(14409 / 2, 14409, buf);
+
   FILE *left_file;
   left_file = fopen("left_map1.out", "w");
   fprintf(left_file, "%s", buf);
@@ -100,7 +106,7 @@ int main(int argc, char ** argv) {
   fprintf(left_file, "%s", buf2);
   fclose(left_file);
 
-  system("python3 post_data.py")
+  system("python3 post_data.py");
   
   //printf("%s\n\r", buf);
 
