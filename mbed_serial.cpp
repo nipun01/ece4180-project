@@ -15,7 +15,7 @@ void readDataFromSerial(int totalByteCount, int bytesPerChunk, int fd, char *buf
     }
     bytesRead += n;
   }
-  buf[totalByteCount + 1] = 0;
+  buf[totalByteCount] = 0;
 }
 
 int main(int argc, char ** argv) {
@@ -82,6 +82,18 @@ int main(int argc, char ** argv) {
   }
   sleep(1);
   */
+  readDataFromSerial(14409, 4000, fd, buf);
+  printf("%s\n\r", buf);
+
+  // Write to the port
+  n = write(fd,"j",1);
+  if (n < 0) {
+    perror("Write failed - ");
+    return -1;
+  }
+
+  sleep(1);
+
   readDataFromSerial(14409, 4000, fd, buf);
   printf("%s\n\r", buf);
 
