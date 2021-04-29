@@ -1,7 +1,7 @@
 from PIL import Image
 
-def main():
-    with open("left_map3.out", "rb") as raw_left, open("right_map3.out", "rb") as raw_right:
+def generate_bitmap(left_file_name, right_file_name):
+    with open(left_file_name, "rb") as raw_left, open(right_file_name, "rb") as raw_right:
         arr_left = bytearray(raw_left.read())
         arr_right = bytearray(raw_right.read())
 
@@ -16,4 +16,4 @@ def main():
         img.save("test.bmp")
 
 if __name__ == "__main__":
-    main()
+    generate_bitmap("left_map.out", "right_map.out")
