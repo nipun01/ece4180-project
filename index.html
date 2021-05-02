@@ -71,7 +71,8 @@
 
 
     <br>
-	
+
+
 	<h3>High-Level Overview</h3>
 	<p>
 		The mbed driver code handles user input from the bluetooth app as well as the control of the LiDAR/Servo combo and sending of mapping data over serial to the Raspberry Pi. The arrow keys on the app are used to control the robot's movement and the 1 button is used to initiate a sweep.
@@ -91,8 +92,13 @@
 	<p>
 		Finally, the web server receives the POST requests and reconstructs the data that was sent. Once this happens, the data is converted into a black and white bitmap format using Pillow. The image is then saved locally and is displayed on the webserver. This is how the images are displayed in real time as the webserver processes them.
 	</p>
+    <p>
+        The location of the robot is the bottom center of the bitmap image. Each pixel represents 10cm.
+    </p>
+
 
 	<br>
+
 
     <h3>Schematic</h3>
         <figure>
@@ -124,6 +130,7 @@
 			Web Server Code: <a href="https://github.com/nipun01/ece4180-project/blob/main/webserver.py">webserver.py</a>
 		</p>
 
+
     <br>
 
 
@@ -137,8 +144,11 @@
         <figure>
             <p align="center"><img src="images/botTopDown.jpg" width="750" height="575"></p>
         </figure>
+
+
     <br>
-	
+
+
 	<h3>Generated Mappings</h3>
 		<figure>
 			<p align="center"><img src="images/map_corner.bmp" width="720" height="360"></p>
@@ -150,12 +160,24 @@
 		</figure>
 
 
+    <br>
+
+
     <h3>Videos</h3>
 
-	<p align="center">
-		<iframe width="560" height="315" src="https://www.youtube.com/embed/7segzwIwbnU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-	</p>
+        <h4>Project Demo</h4>
+    	<p align="center">
+    		<iframe width="560" height="315" src="https://www.youtube.com/embed/7segzwIwbnU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    	</p>
+
+        <h4>Project Presentation</h4>
+        <p align="center">
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/TL-hGXMR9Js" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </p>
+
+
     <br>
+
 
 </body>
 </html>
