@@ -49,7 +49,6 @@ void clearBitmapArray(char *bitmap)
 int getDistanceMeasurementFromLidar()
 {
     int dist = min(tfmini.getDistance(), MAX_RANGE_CM - 1);
-    //pc.printf("distance<%5d cm> strength<%5d>\r\n", dist, tfmini.getDistance());
     if(tfmini.getDistance() < 700) {
         for(int i = 0; i < (int)tfmini.getDistance()/5; i++) {
             //pc.printf("#");
@@ -65,17 +64,12 @@ void plotBitmapPoint(int dist, float currentAngle, char *bitmap)
     // Find the actual x, y coordinate (relative to the bot's current position and orientation) in cm
     float point_x = dist * cos(currentAngle * PI / 180);
     float point_y = dist * sin(currentAngle * PI / 180);
-    //pc.printf("\nAngle: %f, X: %f, Y: %f\n", currentAngle, point_x, point_y);
-    
-    //pc.printf("\nX: %d, Y: %d\n", (int) (point_x / ((float) CM_PER_BLOCK)), (int) (point_y / ((float) CM_PER_BLOCK)));
     
     // Convert this distance to a block index
     int index_x = (int) (point_x / ((float) CM_PER_BLOCK));
     int index_y = (int) (point_y / ((float) CM_PER_BLOCK));
     
     // We have to translate it to end up in the correct location
-    //index_x += MAP_DIM / 2;
-    //index_y += MAP_DIM / 2;
     if (currentAngle < 90) {
         // right
         index_y = MAP_DIM - 1 - index_y;    
@@ -85,23 +79,8 @@ void plotBitmapPoint(int dist, float currentAngle, char *bitmap)
         index_y = MAP_DIM - 1 - index_y;
     }
     
-    //pc.printf("\nIndex X: %d, Index Y: %d\n", index_x, index_y);
-    
     bitmap[index_x + index_y * MAP_DIM] = 1;
 }
-
-// Write the bitmap array data to a file (either on local filesystem or SD card)
-/*
-void writeBitmapToFile(char *bitmap, const char *filepath)
-{
-    pc.printf("\nWriting bitmap to file.\n");
-    FILE *outFile;
-    outFile = fopen(filepath, "wb");
-    fwrite(bitmap, sizeof(char), MAP_DIM*MAP_DIM, outFile);
-    fclose(outFile);
-    pc.printf("\nComplete writing to file.\n");
-}
-*/
 
 void writeBitmapToPi(char *bitmap)
 {
@@ -153,7 +132,7 @@ int main()
                                         for(float p=1.0; p>=0.0; p -= 0.01) // move 1.8 deg. at a time
                                         {
                                             myservo = p;
-                                            wait(0.005);
+                                            wait(0.05);
                                             
                                             
                                             // START DISTANCE READ LOGIC
@@ -165,26 +144,21 @@ int main()
                                             
                                             if (current_angle >= 90 && !right_done) {
                                                 right_done = 1;
-                                                //writeBitmapToFile(bitmap, "/sd/right_map.out");
                                                 writeBitmapToPi(bitmap);
                                                 clearBitmapArray(bitmap);
                                             }
                                             
                                             if (current_angle >= 180 && !left_done) {
                                                 left_done = 1;
-                                                //writeBitmapToFile(bitmap, "/sd/left_map.out");
                                                 writeBitmapToPi(bitmap);
                                                 clearBitmapArray(bitmap);
-                                                // MAY NEED to handle loop finishing prematurely  
                                             }
                                             
                                             current_angle += 1.8;   // simulating a sweep with the servo, angle granularity is 1.8 degrees
                                             
-                                            //pc.printf("\r");
-                                            
                                             // END DISTANCE READ LOGIC                                     
                                             
-                                            wait(0.005);
+                                            wait(0.05);
                                         }  
                                     }
                                     else // do nothing on servo button release
