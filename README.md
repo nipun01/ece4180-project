@@ -1,4 +1,161 @@
-# ece4180-project
-ECE4180-Project Mapping with LIDAR on a Robot
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ECE4180 - LIDAR Mapping Robot</title>
+    <style>
+        h1 {text-align: center;}
+        h2 {text-align: center;}
+        figcaption {
+            text-align: center;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>LIDAR Mapping Robot</h1>
+    <h2>ECE 4180 - Final Project</h2>
 
-Project Page Link: https://nipun01.github.io/ece4180-project/
+
+    <br>
+
+
+    <h3>Introduction</h3>
+        <p>
+            A bluetooth-controlled mobile platform that uses a time of flight LiDAR sensor mounted on a servo to perform 180-degree sweep in order to map its immediate surroundings.
+        </p>
+        <p>
+            Mapping data is sent over a USB-serial connection from the mbed controller to an onboard Raspberry Pi.
+        </p>
+        <p>
+            The Pi sends an HTTP POST request to a web server, which then processes the raw data into a bitmap image for live viewing.
+        </p>
+
+
+    <br>
+
+
+    <h3>Team Members</h3>
+        <ul>
+            <li><b>David Pipes:</b>  dpipes3@gatech.edu</li>
+            <li><b>James Wood:</b>  jwood78@gatech.edu</li>
+            <li><b>Noah Joyce:</b>  njoyce3@gatech.edu</li>
+            <li><b>Nipun Goyal:</b>  ngoyal38@gatech.edu</li>
+        </ul>
+
+
+    <br>
+
+
+    <h3>Parts List</h3>
+        <ul>
+            <li><b>MBED NXP LPC1768:</b> <a href="https://os.mbed.com/">https://os.mbed.com/</a></li>
+            <li><b>Raspberry Pi 3:</b> <a href="https://www.raspberrypi.org/products/raspberry-pi-3-model-b/">https://www.raspberrypi.org/products/raspberry-pi-3-model-b/</a></li>
+            <li><b>HS-322HD Deluxe Servo:</b> <a href="https://www.sparkfun.com/products/11884">https://www.sparkfun.com/products/11884</a>
+                <br>
+                Example Code: <a href="https://os.mbed.com/users/4180_1/notebook/an-introduction-to-servos/">Introduction to Servos</a>
+            </li>
+            <li><b>TFMini - Micro LiDAR Module - SEN-14588:</b> <a href="https://www.sparkfun.com/products/retired/14588">https://www.sparkfun.com/products/retired/14588</a></li>
+            <li><b>2x DG01D DC Motor:</b> <a href="https://www.sparkfun.com/products/13302">https://www.sparkfun.com/products/13302</a></li>
+            <li><b>TB6612FNG H-Bridge:</b> <a href="https://www.sparkfun.com/products/14451">https://www.sparkfun.com/products/14451</a>
+                <br>
+                Example Code: <a href="https://os.mbed.com/cookbook/Motor">https://os.mbed.com/cookbook/Motor</a>
+            </li>
+            <li><b>Bluefruit UART LE Friend - Bluetooth Module</b> <a href="https://www.adafruit.com/product/2479">https://www.adafruit.com/product/2479</a>
+                <br>
+                Example Code: <a href="https://os.mbed.com/users/4180_1/notebook/adafruit-bluefruit-le-uart-friend---bluetooth-low-/">https://os.mbed.com/users/4180_1/notebook/adafruit-bluefruit-le-uart-friend---bluetooth-low-/</a>
+            </li>
+            <li><b>DC power banks</b></li>
+            <li><b>DIP switches</b></li>
+            <li><b>Breadboard</b></li>
+        </ul>
+
+
+    <br>
+
+    <h3>High-Level Overview</h3>
+    <p>
+        The mbed driver code handles user input from the bluetooth app as well as the control of the LiDAR/Servo combo and sending of mapping data over serial to the Raspberry Pi. The arrow keys on the app are used to control the robot's movement and the 1 button is used to initiate a sweep.
+    </p>
+    <p>
+        When the user requests a LiDAR sweep, samples are taken every 1.8 degrees (the granularity of the servo) with the LiDAR. The distances it reads combined with the angle that the LiDAR is currently at is used to calculate the relative (x, y) position of the sampled position.
+    </p>
+    <p>
+        The sweep proceeds from 0-90 degrees and then pauses, allowing the mapped data to be transferred over serial to the Pi. This is because the resolution of the final mapping image (240x120 pixels) is too large to fix within the mbed's onboard RAM. Therefore, two 120x120 images are mapped and sent to the Pi separately.
+    </p>
+    <p>
+        The Pi waits in a loop to receive the mapping data from the mbed, and upon receiving a complete set of data, creates four temporary files, each containing a quarter of the mapped data. This restriction is created due to memory restrictions related to calling Python code from within C++.
+    </p>
+    <p>
+        The C++ driver code on the Pi then transitions to Python code, where the data from the temporary files is sent in four separate POST requests to the webserver. The Python code wraps the data within a json data structure.
+    </p>
+    <p>
+        Finally, the web server receives the POST requests and reconstructs the data that was sent. Once this happens, the data is converted into a black and white bitmap format using Pillow. The image is then saved locally and is displayed on the webserver. This is how the images are displayed in real time as the webserver processes them.
+    </p>
+
+    <br>
+
+    <h3>Schematic</h3>
+        <figure>
+            <p align="center"><img src="images/circuitSchematic.jpg" width="750" height="575"></p>
+        </figure>
+
+        <h4>Block Diagram</h4>
+            <figure>
+                <p align="center"><img src="images/4180FinalProjectBlockDiagram.png" width="750" height="575"></p>
+            </figure>
+
+
+    <br>
+
+
+    <h3>Source Code</h3>
+        All the source code is housed in the following public GitHub repository:
+        <a href="https://github.com/nipun01/ece4180-project">Lidar Mapping Robot</a>
+        <p>
+            mbed Driver Code: <a href="https://github.com/nipun01/ece4180-project/blob/main/bot_LIDAR_PI.cpp">bot_LIDAR_PI.cpp</a>
+        </p>
+        <p>
+            Raspberry Pi Serial Handler Code: <a href="https://github.com/nipun01/ece4180-project/blob/main/mbed_serial.cpp">mbed_serial.cpp</a>
+        </p>
+        <p>
+            Raspberry Pi HTTP POST Code: <a href="https://github.com/nipun01/ece4180-project/blob/main/post_data.py">post_data.py</a>
+        </p>
+        <p>
+            Web Server Code: <a href="https://github.com/nipun01/ece4180-project/blob/main/webserver.py">webserver.py</a>
+        </p>
+
+    <br>
+
+
+    <h3>Photos</h3>
+        <figure>
+            <p align="center"><img src="images/botAngled.jpg" width="750" height="575"></p>
+        </figure>
+        <figure>
+            <p align="center"><img src="images/botAngled2.jpg" width="750" height="575"></p>
+        </figure>
+        <figure>
+            <p align="center"><img src="images/botTopDown.jpg" width="750" height="575"></p>
+        </figure>
+    <br>
+
+    <h3>Generated Mappings</h3>
+        <figure>
+            <p align="center"><img src="images/map_corner.bmp" width="720" height="360"></p>
+            <figcaption>Magnified view of a mapping of a corner with an open door.</figcaption>
+        </figure>
+        <figure>
+            <p align="center"><img src="images/map_good.bmp" width="720" height="360"></p>
+            <figcaption>Magnified view of a mapping of a wall in a hallway.</figcaption>
+        </figure>
+
+
+    <h3>Videos</h3>
+
+    <p align="center">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/7segzwIwbnU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </p>
+    <br>
+
+</body>
+</html>
